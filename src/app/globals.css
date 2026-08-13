@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #f8fafc;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-line: #e2e8f0;
+  --color-brand: #2563eb;
+  --color-brand-dark: #1d4ed8;
+  --color-brand-soft: #eff6ff;
+  --color-ok: #16a34a;
+  --color-warn: #f59e0b;
+  --color-bad: #dc2626;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius-xl2: 1rem;
+}
+
+html,
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Lenis Smooth Scroll styles */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-16px_rgba(15,23,42,0.18)];
+  }
+  .field-label {
+    @apply mb-1.5 block text-[13px] font-medium text-slate-700;
+  }
+  .input {
+    @apply w-full rounded-xl border border-[#e2e8f0] bg-white px-3.5 py-2.5 text-[15px] text-slate-900 outline-none transition
+      placeholder:text-slate-400 focus:border-[#2563eb] focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400;
+  }
+  .btn,
+  .btn-primary,
+  .btn-soft,
+  .btn-ghost,
+  .btn-danger,
+  .btn-ok,
+  .btn-outline {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
+      focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply bg-[#2563eb] text-white hover:bg-[#1d4ed8] active:scale-[0.99];
+  }
+  .btn-soft {
+    @apply border border-[#e2e8f0] bg-white text-slate-700 hover:bg-slate-50;
+  }
+  .btn-outline {
+    @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 hover:text-slate-900 active:scale-[0.99] shadow-xs;
+  }
+  .btn-ghost {
+    @apply text-slate-600 hover:bg-slate-100;
+  }
+  .btn-danger {
+    @apply bg-[#dc2626] text-white hover:bg-red-700;
+  }
+  .btn-ok {
+    @apply bg-[#16a34a] text-white hover:bg-green-700;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+  .th {
+    @apply sticky top-0 z-10 bg-slate-50/95 px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wide text-slate-500 backdrop-blur;
+  }
+  .td {
+    @apply px-4 py-3 text-sm text-slate-700;
+  }
+  .skeleton {
+    @apply animate-pulse rounded-lg bg-slate-200/70;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}

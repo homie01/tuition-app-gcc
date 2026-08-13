@@ -1,0 +1,8 @@
+{
+  "name": "Group Coaching Classes",
+  "description": "Tuition class management system for tracking student attendance, marks, results, and assistant access.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
