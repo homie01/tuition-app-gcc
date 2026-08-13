@@ -25,6 +25,7 @@ type ParsedRow = {
   divisionNameInput: string;
   matchedStandardId: number | null;
   matchedDivisionId: number | null;
+  stream: string;
   shift: string;
   primaryMobile: string;
   secondaryMobile: string;
