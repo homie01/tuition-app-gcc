@@ -16,30 +16,7 @@ import {
 import { Avatar, Badge, Card, CardHead, EmptyState, PageHeader, StatusPill, Tabs } from "@/components/ui";
 import { PerformanceLineChart } from "@/components/charts";
 import { formatDate, formatDateTime, normalizePhone, pct } from "@/lib/utils";
-
-type Student = {
-  id: number;
-  studentCode: string;
-  fullName: string;
-  fatherName: string | null;
-  motherName: string | null;
-  schoolName: string | null;
-  rollNumber: string | null;
-  dateOfBirth: string | null;
-  gender: string | null;
-  address: string | null;
-  primaryMobile: string;
-  secondaryMobile: string | null;
-  whatsappNumber: string | null;
-  guardianName: string | null;
-  relationship: string | null;
-  shift: string;
-  joiningDate: string | null;
-  monthlyFees: number;
-  status: string;
-  photoColor: string | null;
-  notes: string | null;
-};
+import { Student } from "@/lib/demo/types";
 
 type AttRow = {
   id: number;
