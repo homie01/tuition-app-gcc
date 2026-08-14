@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "@/lib/next-compat";
 import { ShieldAlert } from "lucide-react";
 

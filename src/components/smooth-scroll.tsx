@@ -1,10 +1,14 @@
+"use client";
+
 import React, { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import gsap from "gsap";
-import { useLocation } from "react-router-dom";
+import { usePathname, useSearchParams } from "@/lib/next-compat";
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const search = searchParams ? searchParams.toString() : "";
   const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,7 +35,9 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
   // Trigger GSAP entrance animation on route change
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
 
     if (mainRef.current) {
       const elements = mainRef.current.querySelectorAll(
@@ -62,7 +68,8 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
         );
       }
     }
-  }, [location.pathname, location.search]);
+  }, [pathname, search]);
 
   return <div ref={mainRef}>{children}</div>;
 }
+

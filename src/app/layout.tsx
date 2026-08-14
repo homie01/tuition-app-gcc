@@ -15,28 +15,11 @@ export const viewport: Viewport = {
   themeColor: "#2563EB",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var f = window.fetch;
-                  Object.defineProperty(window, 'fetch', {
-                    get: function() { return f; },
-                    set: function(v) { f = v; },
-                    configurable: true,
-                    enumerable: true
-                  });
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
-      </head>
       <body className="min-h-screen bg-[#f8fafc] text-[#0f172a] antialiased">
         <DemoProvider>
           <ToastProvider>{children}</ToastProvider>
