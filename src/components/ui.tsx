@@ -327,7 +327,7 @@ export function Skeleton({ className }: { className?: string }) {
 }
 
 /* --------------------------------- Toasts --------------------------------- */
-type Toast = { id: number; kind: "success" | "error" | "info"; text: string };
+type Toast = { id: number; kind: "success" | "error" | "info" | "warning"; text: string };
 const ToastCtx = React.createContext<{ push: (kind: Toast["kind"], text: string) => void }>({
   push: () => {},
 });
@@ -351,6 +351,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               "pointer-events-auto flex items-start gap-3 rounded-xl border bg-white px-4 py-3 shadow-lg",
               t.kind === "success" && "border-green-200",
               t.kind === "error" && "border-red-200",
+              t.kind === "warning" && "border-amber-200",
               t.kind === "info" && "border-slate-200",
             )}
           >
@@ -359,10 +360,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 "mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-white",
                 t.kind === "success" && "bg-[#16a34a]",
                 t.kind === "error" && "bg-[#dc2626]",
+                t.kind === "warning" && "bg-[#d97706]",
                 t.kind === "info" && "bg-[#2563eb]",
               )}
             >
-              {t.kind === "success" ? <Check className="h-3.5 w-3.5" /> : t.kind === "error" ? <AlertTriangle className="h-3.5 w-3.5" /> : <Info className="h-3.5 w-3.5" />}
+              {t.kind === "success" ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : t.kind === "error" || t.kind === "warning" ? (
+                <AlertTriangle className="h-3.5 w-3.5" />
+              ) : (
+                <Info className="h-3.5 w-3.5" />
+              )}
             </span>
             <p className="text-sm font-medium text-slate-700">{t.text}</p>
           </div>
