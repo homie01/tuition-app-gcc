@@ -73,6 +73,17 @@ export default function MarksPage() {
 
   const selectedExam = state.exams.find((e) => String(e.id) === examId);
 
+  React.useEffect(() => {
+    if (selectedExam) {
+      if (selectedExam.subjectId) {
+        setSubjectId(String(selectedExam.subjectId));
+      }
+      if (selectedExam.stream) {
+        setStream(selectedExam.stream);
+      }
+    }
+  }, [selectedExam]);
+
   const roster = React.useMemo(() => {
     if (!selectedExam) return [];
     return state.students
@@ -177,14 +188,38 @@ export default function MarksPage() {
             </Select>
           </Field>
           <Field label="Exam / Test">
-            <Select value={examId} onChange={(e) => setExamId(e.target.value)}>
+            <Select
+              value={examId}
+              onChange={(e) => {
+                const newId = e.target.value;
+                setExamId(newId);
+                const ex = state.exams.find((x) => String(x.id) === newId);
+                if (ex?.subjectId) {
+                  setSubjectId(String(ex.subjectId));
+                }
+              }}
+            >
               {!examsForStandard.length ? <option value="">No exams yet</option> : null}
-              {examsForStandard.map((e) => <option key={e.id} value={e.id}>{e.name} — {formatDate(e.examDate)}</option>)}
+              {examsForStandard.map((e) => {
+                const sub = e.subjectId ? state.subjects.find((s) => s.id === e.subjectId) : null;
+                return (
+                  <option key={e.id} value={e.id}>
+                    {e.name}{sub ? ` (${sub.name})` : ""} — {formatDate(e.examDate)}
+                  </option>
+                );
+              })}
             </Select>
           </Field>
           <Field label="Subject">
             <Select value={subjectId} onChange={(e) => setSubjectId(e.target.value)} disabled={mode === "overview"}>
-              {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+              {subjects.map((s) => {
+                const isExamSub = selectedExam?.subjectId === s.id;
+                return (
+                  <option key={s.id} value={s.id}>
+                    {s.name}{isExamSub ? " ★ (Exam Subject)" : ""}
+                  </option>
+                );
+              })}
             </Select>
           </Field>
           <Field label="Maximum marks">
@@ -213,6 +248,13 @@ export default function MarksPage() {
           </div>
           {selectedExam ? (
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
+              {selectedExam.subjectId ? (
+                <Badge tone="brand">
+                  Subject: {state.subjects.find((s) => s.id === selectedExam.subjectId)?.name ?? "Subject"}
+                </Badge>
+              ) : (
+                <Badge tone="neutral">All Subjects</Badge>
+              )}
               <Badge tone="neutral">Exam date {formatDate(selectedExam.examDate)}</Badge>
               {canGenerate ? (
                 <Button variant="ok" onClick={handleGenerate} loading={generating} disabled={!examMarks.length} className="grow sm:grow-0 justify-center">
@@ -245,7 +287,12 @@ export default function MarksPage() {
                   <th className="th w-12">#</th>
                   <th className="th">Student</th>
                   <th className="th">Student ID</th>
-                  <th className="th w-44 text-right">Marks (out of {maxMarks})</th>
+                  <th className="th w-44 text-right">
+                    Marks (out of {maxMarks})
+                    <span className="block text-[11px] font-normal text-slate-400">
+                      {state.subjects.find((s) => String(s.id) === subjectId)?.name ?? "Subject"}
+                    </span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -288,7 +335,15 @@ export default function MarksPage() {
               <thead>
                 <tr>
                   <th className="th">Student</th>
-                  {subjects.map((s) => <th key={s.id} className="th text-right">{s.name}</th>)}
+                  {subjects.map((s) => {
+                    const isExamSub = selectedExam?.subjectId === s.id;
+                    return (
+                      <th key={s.id} className={`th text-right ${isExamSub ? "text-[#2563eb] font-bold bg-blue-50/50" : ""}`}>
+                        {s.name}
+                        {isExamSub ? <span className="block text-[10px] text-[#2563eb] font-semibold uppercase tracking-wider">Exam Subject</span> : null}
+                      </th>
+                    );
+                  })}
                   <th className="th text-right">Total</th>
                   <th className="th text-right">%</th>
                 </tr>
@@ -303,7 +358,12 @@ export default function MarksPage() {
                       <td className="td font-semibold text-slate-800">{r.fullName}</td>
                       {subjects.map((s) => {
                         const m = rowMarks.find((x) => x.subjectId === s.id);
-                        return <td key={s.id} className="td text-right">{m ? m.marksObtained : "—"}</td>;
+                        const isExamSub = selectedExam?.subjectId === s.id;
+                        return (
+                          <td key={s.id} className={`td text-right ${isExamSub ? "font-semibold text-slate-900 bg-blue-50/20" : ""}`}>
+                            {m ? m.marksObtained : "—"}
+                          </td>
+                        );
                       })}
                       <td className="td text-right font-semibold">{max ? `${total}/${max}` : "—"}</td>
                       <td className="td text-right">
@@ -323,11 +383,24 @@ export default function MarksPage() {
         onClose={() => setNewExam(false)}
         standards={standards}
         defaultStandardId={standardId}
-        onCreate={(name, stdId, date, max) => {
-          const exam = createExam({ name, standardId: stdId, examDate: date, maxMarksDefault: max });
-          push("success", "Exam created.");
+        defaultSubjectId={subjectId}
+        defaultStream={stream}
+        onCreate={(name, stdId, subId, streamVal, date, max) => {
+          const exam = createExam({
+            name,
+            standardId: stdId,
+            subjectId: subId,
+            stream: streamVal,
+            examDate: date,
+            maxMarksDefault: max,
+          });
+          push("success", "Exam created successfully.");
           setStandardId(String(stdId));
+          if (streamVal) setStream(streamVal);
           setExamId(String(exam.id));
+          if (subId) {
+            setSubjectId(String(subId));
+          }
           setMaxMarks(String(max));
           setNewExam(false);
         }}
@@ -339,6 +412,7 @@ export default function MarksPage() {
         defaultStandardId={standardId}
         defaultDivisionId={divisionId}
         defaultStream={stream}
+        defaultExamId={examId}
       />
     </div>
   );
@@ -349,44 +423,80 @@ function NewExamModal({
   onClose,
   standards,
   defaultStandardId,
+  defaultSubjectId,
+  defaultStream,
   onCreate,
 }: {
   open: boolean;
   onClose: () => void;
   standards: { id: number; name: string }[];
   defaultStandardId: string;
-  onCreate: (name: string, standardId: number, examDate: string, maxMarks: number) => void;
+  defaultSubjectId?: string;
+  defaultStream?: string;
+  onCreate: (
+    name: string,
+    standardId: number,
+    subjectId: number | null,
+    stream: string | null,
+    examDate: string,
+    maxMarks: number
+  ) => void;
 }) {
+  const { getSubjectsForStandard } = useDemo();
   const [name, setName] = React.useState("Unit Test");
   const [standardId, setStandardId] = React.useState(defaultStandardId);
-  const [stream, setStream] = React.useState("Science");
+  const [stream, setStream] = React.useState(defaultStream || "Science");
+  const [subjectId, setSubjectId] = React.useState(defaultSubjectId || "");
   const [examDate, setExamDate] = React.useState(todayISO());
   const [maxMarksDefault, setMaxMarksDefault] = React.useState("100");
-
-  React.useEffect(() => {
-    if (open) {
-      setStandardId(defaultStandardId);
-      setName("Unit Test");
-      setExamDate(todayISO());
-      setMaxMarksDefault("100");
-    }
-  }, [defaultStandardId, open]);
 
   const selectedStd = standards.find((s) => String(s.id) === standardId);
   const is11or12 = selectedStd
     ? selectedStd.name.toLowerCase().includes("11") || selectedStd.name.toLowerCase().includes("12")
     : false;
 
+  const modalSubjects = React.useMemo(() => {
+    return getSubjectsForStandard(standardId, is11or12 ? stream : undefined);
+  }, [getSubjectsForStandard, standardId, is11or12, stream]);
+
+  React.useEffect(() => {
+    if (open) {
+      setStandardId(defaultStandardId);
+      setName("Unit Test");
+      setStream(defaultStream || "Science");
+      setSubjectId(defaultSubjectId || "");
+      setExamDate(todayISO());
+      setMaxMarksDefault("100");
+    }
+  }, [defaultStandardId, defaultSubjectId, defaultStream, open]);
+
+  React.useEffect(() => {
+    if (modalSubjects.length && (!subjectId || !modalSubjects.some((s) => String(s.id) === subjectId))) {
+      setSubjectId(String(modalSubjects[0].id));
+    }
+  }, [modalSubjects, subjectId]);
+
   return (
     <Modal
       open={open}
       onClose={onClose}
       title="Create a new exam"
-      description="Give the exam a simple name like “Unit Test 3” or “Mid Term Exam”."
+      description="Choose standard and subject for this test, or create a comprehensive exam."
       footer={
         <>
           <Button variant="soft" onClick={onClose}>Cancel</Button>
-          <Button onClick={() => onCreate(name.trim() || "Unit Test", Number(standardId), examDate, Number(maxMarksDefault) || 100)}>
+          <Button
+            onClick={() =>
+              onCreate(
+                name.trim() || "Unit Test",
+                Number(standardId),
+                subjectId ? Number(subjectId) : null,
+                is11or12 ? stream : null,
+                examDate,
+                Number(maxMarksDefault) || 100
+              )
+            }
+          >
             Create exam
           </Button>
         </>
@@ -394,10 +504,15 @@ function NewExamModal({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Exam name" required className="sm:col-span-2">
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Unit Test 3" />
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Unit Test 3, Mid Term Exam" />
         </Field>
         <Field label="Standard" required>
-          <Select value={standardId} onChange={(e) => setStandardId(e.target.value)}>
+          <Select
+            value={standardId}
+            onChange={(e) => {
+              setStandardId(e.target.value);
+            }}
+          >
             {standards.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </Select>
         </Field>
@@ -409,10 +524,20 @@ function NewExamModal({
             </Select>
           </Field>
         ) : null}
+        <Field label="Subject" required className={is11or12 ? "" : "sm:col-span-1"}>
+          <Select value={subjectId} onChange={(e) => setSubjectId(e.target.value)}>
+            <option value="">All Subjects (Multi-subject Exam)</option>
+            {modalSubjects.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </Select>
+        </Field>
         <Field label="Exam date" required>
           <Input type="date" value={examDate} onChange={(e) => setExamDate(e.target.value)} />
         </Field>
-        <Field label="Default maximum marks">
+        <Field label="Default maximum marks" required>
           <Input inputMode="numeric" value={maxMarksDefault} onChange={(e) => setMaxMarksDefault(e.target.value)} />
         </Field>
       </div>

@@ -71,6 +71,8 @@ export type Exam = {
   id: number;
   name: string;
   standardId: number;
+  subjectId?: number | null;
+  stream?: string | null;
   examDate: string;
   resultDate: string | null;
   maxMarksDefault: number;

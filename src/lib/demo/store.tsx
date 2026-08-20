@@ -43,7 +43,14 @@ type Ctx = {
     shift: string;
     entries: { studentId: number; status: AttendanceStatus }[];
   }) => { saved: number; updated: boolean };
-  createExam: (input: { name: string; standardId: number; examDate: string; maxMarksDefault: number }) => Exam;
+  createExam: (input: {
+    name: string;
+    standardId: number;
+    subjectId?: number | null;
+    stream?: string | null;
+    examDate: string;
+    maxMarksDefault: number;
+  }) => Exam;
   saveMarks: (input: {
     examId: number;
     subjectId: number;
@@ -351,6 +358,8 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           id,
           name: input.name,
           standardId: input.standardId,
+          subjectId: input.subjectId ?? null,
+          stream: input.stream ?? null,
           examDate: input.examDate,
           resultDate: null,
           maxMarksDefault: input.maxMarksDefault,
@@ -359,7 +368,9 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         };
         d.exams.push(exam);
         createdExam = exam;
-        pushLog(d, "exam.create", `${sessionUser?.name} created exam “${input.name}”.`);
+        const subName = input.subjectId ? d.subjects.find((s) => s.id === input.subjectId)?.name : null;
+        const subText = subName ? ` (${subName})` : "";
+        pushLog(d, "exam.create", `${sessionUser?.name} created exam “${input.name}${subText}”.`);
         return d;
       });
       return createdExam!;

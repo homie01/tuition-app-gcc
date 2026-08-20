@@ -86,6 +86,8 @@ export const marksSaveSchema = z.object({
 export const examSchema = z.object({
   name: z.string().trim().min(2, "Exam name is required"),
   standardId: z.coerce.number().int().positive(),
+  subjectId: z.coerce.number().int().positive().nullable().optional(),
+  stream: z.string().nullable().optional(),
   divisionId: z.coerce.number().int().nullable().optional(),
   examDate: z.string().min(8),
   resultDate: z

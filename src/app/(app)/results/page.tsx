@@ -46,18 +46,26 @@ function ResultsInner() {
         <CardHead title="Select an exam" icon={<Trophy className="h-4.5 w-4.5" />} />
         <div className="flex flex-wrap gap-2 p-4">
           {published.length ? (
-            published.map((e) => (
-              <button
-                key={e.id}
-                onClick={() => setActiveId(e.id)}
-                className={`rounded-xl border px-3.5 py-2 text-[13px] font-medium transition ${
-                  e.id === activeId ? "border-[#2563eb] bg-[#eff6ff] text-[#1d4ed8]" : "border-[#e2e8f0] text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                {standardName(e.standardId)} · {e.name}
-                <span className="ml-2 text-[11px] text-slate-400">{formatDate(e.examDate)}</span>
-              </button>
-            ))
+            published.map((e) => {
+              const sub = e.subjectId ? state.subjects.find((s) => s.id === e.subjectId) : null;
+              return (
+                <button
+                  key={e.id}
+                  onClick={() => setActiveId(e.id)}
+                  className={`rounded-xl border px-3.5 py-2 text-[13px] font-medium transition ${
+                    e.id === activeId ? "border-[#2563eb] bg-[#eff6ff] text-[#1d4ed8]" : "border-[#e2e8f0] text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {standardName(e.standardId)} · {e.name}
+                  {sub ? (
+                    <span className="ml-1.5 rounded-md bg-blue-100/90 px-1.5 py-0.5 text-[11px] font-semibold text-blue-700">
+                      {sub.name}
+                    </span>
+                  ) : null}
+                  <span className="ml-2 text-[11px] text-slate-400">{formatDate(e.examDate)}</span>
+                </button>
+              );
+            })
           ) : (
             <p className="px-1 py-2 text-sm text-slate-500">No published results yet. Generate results from Marks.</p>
           )}
@@ -74,7 +82,21 @@ function ResultsInner() {
           </div>
 
           <Card className="overflow-hidden">
-            <CardHead title={`${standardName(active.standardId)} · ${active.name}`} subtitle={`Exam date ${formatDate(active.examDate)}`} />
+            <CardHead
+              title={`${standardName(active.standardId)} · ${active.name}${
+                active.subjectId ? ` (${state.subjects.find((s) => s.id === active.subjectId)?.name ?? "Subject"})` : ""
+              }`}
+              subtitle={`Exam date ${formatDate(active.examDate)}${
+                active.subjectId ? ` · Subject: ${state.subjects.find((s) => s.id === active.subjectId)?.name ?? ""}` : ""
+              }`}
+              action={
+                active.subjectId ? (
+                  <Badge tone="brand">
+                    Subject: {state.subjects.find((s) => s.id === active.subjectId)?.name ?? ""}
+                  </Badge>
+                ) : undefined
+              }
+            />
             <div className="max-h-[65vh] overflow-auto">
               <table className="w-full min-w-[820px]">
                 <thead>

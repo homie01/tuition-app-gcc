@@ -155,7 +155,14 @@ export default function ReportsPage() {
             <label className="field-label">Exam</label>
             <Select value={examId} onChange={(e) => setExamId(e.target.value)}>
               <option value="">All exams</option>
-              {examOptions.map((e) => <option key={e.id} value={e.id}>{standardName(e.standardId)} · {e.name}</option>)}
+              {examOptions.map((e) => {
+                const sub = e.subjectId ? state.subjects.find((s) => s.id === e.subjectId) : null;
+                return (
+                  <option key={e.id} value={e.id}>
+                    {standardName(e.standardId)} · {e.name}{sub ? ` (${sub.name})` : ""}
+                  </option>
+                );
+              })}
             </Select>
           </div>
           <div>
@@ -236,6 +243,7 @@ export default function ReportsPage() {
         defaultStandardId={standardId}
         defaultDivisionId={divisionId}
         defaultStream={stream}
+        defaultExamId={examId}
       />
     </div>
   );
