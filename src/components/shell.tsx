@@ -231,6 +231,45 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               </AnimatePresence>
             </div>
 
+            <div className="relative shrink-0 ml-auto pt-[6px] pl-[9px]">
+              <button
+                onClick={() => setMenu((m) => !m)}
+                className="flex items-center gap-1.5 sm:gap-2 rounded-xl border border-[#e2e8f0] p-1.5 sm:py-1.5 sm:pl-1.5 sm:pr-2.5 hover:bg-slate-50"
+              >
+                <Avatar name={user.name} color={user.avatarColor} size={28} />
+                <span className="hidden text-left sm:block">
+                  <span className="block text-[13px] font-semibold leading-4 text-slate-800">{user.name}</span>
+                  <span className="block text-[11px] capitalize text-slate-400">{user.role}</span>
+                </span>
+                <ChevronDown className="h-4 w-4 text-slate-400" />
+              </button>
+              <AnimatePresence>
+                {menu ? (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setMenu(false)} />
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-12 z-20 w-56 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white py-1.5 shadow-xl"
+                    >
+                      <Link href="/profile" className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">My profile</Link>
+                      {user.role === "admin" ? (
+                        <Link href="/settings" className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">Application settings</Link>
+                      ) : null}
+                      <button
+                        onClick={doLogout}
+                        className="flex w-full items-center gap-2 border-t border-slate-100 px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+                      >
+                        <LogOut className="h-4 w-4" /> Logout
+                      </button>
+                    </motion.div>
+                  </>
+                ) : null}
+              </AnimatePresence>
+            </div>
+
             <div className="relative shrink-0">
               <button onClick={() => setBell((b) => !b)} className="relative rounded-xl p-2 sm:p-2.5 text-slate-500 hover:bg-slate-100">
                 <Bell className="h-5 w-5" />
@@ -277,45 +316,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                       <Link href="/notifications" className="block bg-slate-50 px-4 py-2.5 text-center text-[13px] font-semibold text-[#2563eb]">
                         View all notifications
                       </Link>
-                    </motion.div>
-                  </>
-                ) : null}
-              </AnimatePresence>
-            </div>
-
-            <div className="relative shrink-0">
-              <button
-                onClick={() => setMenu((m) => !m)}
-                className="flex items-center gap-1.5 sm:gap-2 rounded-xl border border-[#e2e8f0] p-1.5 sm:py-1.5 sm:pl-1.5 sm:pr-2.5 hover:bg-slate-50"
-              >
-                <Avatar name={user.name} color={user.avatarColor} size={28} />
-                <span className="hidden text-left sm:block">
-                  <span className="block text-[13px] font-semibold leading-4 text-slate-800">{user.name}</span>
-                  <span className="block text-[11px] capitalize text-slate-400">{user.role}</span>
-                </span>
-                <ChevronDown className="h-4 w-4 text-slate-400" />
-              </button>
-              <AnimatePresence>
-                {menu ? (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setMenu(false)} />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: -8 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: -8 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-12 z-20 w-56 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white py-1.5 shadow-xl"
-                    >
-                      <Link href="/profile" className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">My profile</Link>
-                      {user.role === "admin" ? (
-                        <Link href="/settings" className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">Application settings</Link>
-                      ) : null}
-                      <button
-                        onClick={doLogout}
-                        className="flex w-full items-center gap-2 border-t border-slate-100 px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50"
-                      >
-                        <LogOut className="h-4 w-4" /> Logout
-                      </button>
                     </motion.div>
                   </>
                 ) : null}

@@ -6,6 +6,7 @@ import { Button, Input, Modal, Select, useToast } from "@/components/ui";
 import { formatDate, pct } from "@/lib/utils";
 import { gradeFor } from "@/lib/grading";
 import { useDemo } from "@/lib/demo/store";
+import type { Student } from "@/lib/demo/types";
 
 const GCC_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
   <circle cx="150" cy="150" r="142" fill="#ffffff" stroke="#222222" stroke-width="5"/>
